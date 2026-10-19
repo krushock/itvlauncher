@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Light appearance (Controls → Display → Appearance). -->
+<resources>
+    <color name="bg">#FFEDEDF0</color>
+    <color name="text_primary">#FF1C1C1E</color>
+    <color name="text_name">#F21C1C1E</color>
+    <color name="text_secondary">#A61C1C1E</color>
+    <color name="text_tertiary">#801C1C1E</color>
+    <color name="divider">#261C1C1E</color>
+
+    <color name="tile_bg">#FFD9D9DE</color>
+    <color name="tile_label">#FF1C1C1E</color>
+    <color name="folder_bg">#FFD1D1D6</color>
+    <color name="folder_cell">#FFBFBFC6</color>
+    <color name="focus_outline">#FF1C1C1E</color>
+
+    <color name="pill_fill_top">#E6FFFFFF</color>
+    <color name="pill_fill_bottom">#B3FFFFFF</color>
+    <color name="pill_stroke">#1F000000</color>
+    <color name="pill_focused">#FF1C1C1E</color>
+    <color name="on_pill">#FF1C1C1E</color>
+    <color name="on_pill_focused">#FFFFFFFF</color>
+    <color name="on_pill_dim">#801C1C1E</color>
+    <color name="on_pill_dim_focused">#B3FFFFFF</color>
+
+    <color name="panel_top">#F7FFFFFF</color>
+    <color name="panel_bottom">#FAF2F2F5</color>
+    <color name="panel_stroke">#1F000000</color>
+    <color name="panel_divider">#1A000000</color>
+    <color name="field_fill">#0D1C1C1E</color>
+    <color name="field_fill_focused">#141C1C1E</color>
+    <color name="field_stroke">#CC1C1C1E</color>
+    <color name="hint">#801C1C1E</color>
+
+    <color name="dock_band">#0F000000</color>
+    <color name="dock_edge">#1A000000</color>
+    <color name="glass_fill_top">#59FFFFFF</color>
+    <color name="glass_fill_bottom">#26FFFFFF</color>
+    <color name="glass_specular">#80FFFFFF</color>
+    <color name="glass_rim">#8C1C1C1E</color>
+    <color name="glass_glow">#FF000000</color>
+
+    <color name="progress_track">#331C1C1E</color>
+    <color name="progress_fill">#FF1C1C1E</color>
+    <color name="backdrop_scrim">#B3EDEDF0</color>
+    <color name="scrim_top">#99EDEDF0</color>
+    <color name="scrim_middle">#BFEDEDF0</color>
+    <color name="scrim_bottom">#F7EDEDF0</color>
+</resources>

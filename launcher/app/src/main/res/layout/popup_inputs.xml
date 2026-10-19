@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.krushock.itvlauncher.GlassPanel xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/panel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,9 +8,22 @@
     android:padding="6dp"
     android:elevation="12dp">
 
-    <LinearLayout
-        android:id="@+id/rows"
+    <!-- Scrolls when the popup is taller than the screen (a long list of notifications); the edges fade to show
+         there's more. Not focusable itself: focus goes to the rows. -->
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
-</LinearLayout>
+        android:focusable="false"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="40dp">
+
+        <LinearLayout
+            android:id="@+id/rows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+</com.krushock.itvlauncher.GlassPanel>

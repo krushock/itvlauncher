@@ -43,7 +43,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:ellipsize="end"
-            android:textColor="#FFFFFFFF"
+            android:textColor="@color/tile_label"
             android:textSize="13sp"
             android:fontFamily="@font/outfit"
             android:visibility="gone" />
@@ -60,7 +60,7 @@
         android:ellipsize="end"
         android:alpha="0"
         android:translationY="-6dp"
-        android:textColor="#F2FFFFFF"
+        android:textColor="@color/text_name"
         android:textSize="14sp"
         android:fontFamily="@font/outfit"
         android:fontVariationSettings="'wght' 500"

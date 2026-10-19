@@ -2,37 +2,52 @@ plugins {
     id 'com.android.application'
 }
 
+// Release signing key, kept outside the repository: a properties file with storeFile, storePassword, keyAlias and
+// keyPassword, at ~/.config/krushock/itvlauncher-signing.properties or wherever ITVLAUNCHER_SIGNING points.
+// Without it, release builds come out unsigned and debug builds are unaffected.
+def signingFile = new File(System.getenv('ITVLAUNCHER_SIGNING')
+        ?: "${System.getProperty('user.home')}/.config/krushock/itvlauncher-signing.properties")
+def signing = new Properties()
+if (signingFile.isFile()) signingFile.withInputStream { signing.load(it) }
+
 android {
-    namespace 'com.gathin.tvhome'
-    compileSdk 34
+    namespace = 'com.krushock.itvlauncher'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId 'com.gathin.tvhome'
-        minSdk 26
-        targetSdk 29
-        versionCode 2
-        versionName '2.0'
+        applicationId = 'com.krushock.itvlauncher'
+        minSdk = 26
+        // The newest Android: Play Protect warns about sideloaded apps that target old versions.
+        targetSdk = 37
+        versionCode = 4
+        versionName = '2.2'
+    }
+
+    if (signing.storeFile) {
+        signingConfigs {
+            release {
+                storeFile = file(signing.storeFile)
+                storePassword = signing.storePassword
+                keyAlias = signing.keyAlias
+                keyPassword = signing.keyPassword
+            }
+        }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
+            if (signing.storeFile) signingConfig = signingConfigs.release
         }
     }
 
-    lint {
-        // The launcher is sideloaded over ADB, never published to Google Play, so Play's minimum targetSdk
-        // does not apply; without this, lintVitalRelease fails assembleRelease.
-        disable 'ExpiredTargetSdkVersion'
-    }
-
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
 dependencies {
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
-    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.dynamicanimation:dynamicanimation:1.1.0'
 }

@@ -1,4 +1,4 @@
-package com.gathin.tvhome;
+package com.krushock.itvlauncher;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;

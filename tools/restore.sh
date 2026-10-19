@@ -12,6 +12,7 @@ PY=tools/venv/bin/python
 export MSYS_NO_PATHCONV=1
 {
   grep -vE '^\s*(#|$)' "$LIST" | sed -E 's/\s+#.*$//' | awk '{print "pm enable " $1}'
+  echo "pm enable com.google.android.tungsten.setupwraith 2>/dev/null; echo setup-app-on"   # Google TV, see build-and-install.sh
   echo "pm enable $STOCK"
   # resolve the stock HOME component on the TV (Android 9 needs pkg/activity, not just pkg)
   echo "cmd package set-home-activity --user 0 \$(cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME $STOCK | tail -n 1)"

@@ -25,7 +25,9 @@ is reversible from the TV's own settings if the tools are gone.
 ## 2. Improve the launcher
 
 The launcher lives in `launcher/` and is deliberately small: plain Java, AndroidX RecyclerView and
-DynamicAnimation, no Kotlin, no Compose, no network. It targets TVs with 1 GB of RAM, so:
+DynamicAnimation, no Kotlin, no Compose. The only network use is Top Shelf artwork and the weather
+(Open-Meteo); keep it that way, and make anything online fail quietly offline. It targets TVs with
+1 GB of RAM, so:
 
 - No blur, no video backgrounds, no polling, no background services.
 - Anything that depends on a specific TV goes in `app/src/main/res/values/config.xml`, not in code.
@@ -34,12 +36,12 @@ DynamicAnimation, no Kotlin, no Compose, no network. It targets TVs with 1 GB of
   screenshot: `tools/tv.py 'input keyevent KEYCODE_DPAD_DOWN; screencap -p /sdcard/s.png'` then
   `tools/tv.py --pull /sdcard/s.png s.png`. Include a screenshot in your pull request.
 
-Build with `TV_HOST=<ip> launcher/build-and-install.sh` (JDK 17, Android SDK platform 34 and
-build-tools 34.0.0; on macOS `brew install openjdk@17 android-commandlinetools` then
-`sdkmanager "platforms;android-34" "build-tools;34.0.0"`).
+Build with `TV_HOST=<ip> launcher/build-and-install.sh` (JDK 17+, Android SDK platform 37 and
+build-tools 36.0.0; Android Studio ships all of it, or on macOS `brew install openjdk android-commandlinetools`
+then `sdkmanager "platforms;android-37.0" "build-tools;36.0.0"`).
 
-Ideas that fit the direction: an idle screensaver with clock and ambient colour, per-TV icon packs
-for apps without banners, a settings screen to edit the dock from the TV, localisation.
+Ideas that fit the direction: per-TV icon packs for apps without banners, more localisation,
+more screensavers.
 Ideas that don't: recommendation rows, content feeds, ads, telemetry.
 
 ## 3. Improve the prompt and tools

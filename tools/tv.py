@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Minimal ADB-over-TCP client for an Android TV using adb_shell (no adb binary needed).
 
-Set TV_HOST to the TV's IP. Usage:
+Set TV_HOST to the TV's IP. TV_ADBKEY picks an existing private key instead of the one generated in
+tools/adbkey/ (e.g. ~/.android/adbkey, which emulators already trust). Usage:
     tv.py --probe                      connect and print model / Android version
     tv.py <shell command...>           run one shell command
     tv.py --batch < commands.txt       one command per line, same connection
@@ -20,13 +21,13 @@ PORT = int(os.environ.get("TV_PORT", "5555"))
 if not HOST:
     sys.exit("Set TV_HOST to your TV's IP address, e.g.  TV_HOST=192.168.1.50 tools/tv.py --probe\n"
              "(find it under Settings → Network, or look for the TV in `arp -a`)")
-KEYDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "adbkey")
-KEY = os.path.join(KEYDIR, "adbkey")
+KEY = os.path.expanduser(os.environ.get("TV_ADBKEY", "")) or \
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "adbkey", "adbkey")
 
 
 def get_signer():
-    os.makedirs(KEYDIR, exist_ok=True)
     if not os.path.exists(KEY):
+        os.makedirs(os.path.dirname(KEY), exist_ok=True)
         keygen(KEY)
     with open(KEY) as f:
         priv = f.read()

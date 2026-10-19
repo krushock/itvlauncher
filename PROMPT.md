@@ -58,7 +58,8 @@ Launcher
   listing the HDMI ports, AV and Live TV, switching via the TV input framework.
 - Make D-pad navigation deterministic: Up/Down move exactly one row, Up from the dock goes to the top
   bar, the ends of the top bar don't fall through to tiles. Remember the last focused tile.
-- Keep it light: the TV has about 1 GB of RAM. No blur, no video, no network polling.
+- Keep it light: the TV has about 1 GB of RAM. No blur, no video, no background polling; anything
+  that uses the network must keep working, quietly, without a connection.
 
 Verify
 - After each change, inject remote key presses over ADB, take a screenshot from the TV and look at it.

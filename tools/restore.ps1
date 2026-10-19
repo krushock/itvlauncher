@@ -18,6 +18,7 @@ $env:TV_HOST = $TvHost
 
 $pkgs = Get-Content $List | ForEach-Object { ($_ -replace '#.*$', '').Trim() } | Where-Object { $_ }
 $cmds = @($pkgs | ForEach-Object { "pm enable $_" }) + @(
+    'pm enable com.google.android.tungsten.setupwraith 2>/dev/null; echo setup-app-on',   # Google TV, see build-and-install.ps1
     "pm enable $Stock",
     "cmd package set-home-activity --user 0 $Stock",
     'settings put global window_animation_scale 1.0',

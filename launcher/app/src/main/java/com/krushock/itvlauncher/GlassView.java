@@ -1,4 +1,4 @@
-package com.gathin.tvhome;
+package com.krushock.itvlauncher;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -24,6 +24,7 @@ public class GlassView extends View {
     private final Path clip = new Path();
     private final float density;
     private float radius;
+    private final int fillTop, fillBottom, specularTop, glowRgb;
 
     public GlassView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -31,8 +32,13 @@ public class GlassView extends View {
         radius = 20f * density;
         rim.setStyle(Paint.Style.STROKE);
         rim.setStrokeWidth(1.5f * density);
-        rim.setColor(0xCCFFFFFF);
+        rim.setColor(context.getColor(R.color.glass_rim));
         glow.setStyle(Paint.Style.STROKE);
+        // Light or dark appearance (res/values*/colors.xml).
+        fillTop = context.getColor(R.color.glass_fill_top);
+        fillBottom = context.getColor(R.color.glass_fill_bottom);
+        specularTop = context.getColor(R.color.glass_specular);
+        glowRgb = context.getColor(R.color.glass_glow) & 0x00FFFFFF;
     }
 
     void setRadius(float px) {
@@ -43,8 +49,9 @@ public class GlassView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        fill.setShader(new LinearGradient(0, 0, 0, h, 0x3DFFFFFF, 0x12FFFFFF, Shader.TileMode.CLAMP));
-        specular.setShader(new LinearGradient(0, 0, 0, h * 0.45f, 0x66FFFFFF, 0x00FFFFFF, Shader.TileMode.CLAMP));
+        fill.setShader(new LinearGradient(0, 0, 0, h, fillTop, fillBottom, Shader.TileMode.CLAMP));
+        specular.setShader(new LinearGradient(0, 0, 0, h * 0.45f, specularTop, specularTop & 0x00FFFFFF,
+                Shader.TileMode.CLAMP));
     }
 
     @Override
@@ -55,7 +62,7 @@ public class GlassView extends View {
         // Outer glow: three widening, fading strokes.
         for (int i = 1; i <= 3; i++) {
             glow.setStrokeWidth(i * 2f * density);
-            glow.setColor((0x30 / i) << 24 | 0xFFFFFF);
+            glow.setColor((0x30 / i) << 24 | glowRgb);
             float o = i * density;
             canvas.drawRoundRect(rect.left - o, rect.top - o, rect.right + o, rect.bottom + o, radius + o, radius + o, glow);
         }

@@ -1,4 +1,4 @@
-package com.gathin.tvhome;
+package com.krushock.itvlauncher;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -18,13 +18,14 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
     private final Paint edge = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
 
-    DockDecoration(int dockSize, float density) {
+    DockDecoration(android.content.Context ctx, int dockSize, float density) {
         this.dockSize = dockSize;
         this.density = density;
-        band.setColor(0xFF141416);
+        // Translucent, like tvOS 26's glass dock: the ambient glow shows through.
+        band.setColor(ctx.getColor(R.color.dock_band));
         edge.setStyle(Paint.Style.STROKE);
         edge.setStrokeWidth(density);
-        edge.setColor(0x1FFFFFFF);
+        edge.setColor(ctx.getColor(R.color.dock_edge));
     }
 
     @Override
