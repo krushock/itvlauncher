@@ -14,6 +14,10 @@ export MSYS_NO_PATHCONV=1
   grep -vE '^\s*(#|$)' "$LIST" | sed -E 's/\s+#.*$//' | awk '{print "pm enable " $1}'
   echo "pm enable com.google.android.tungsten.setupwraith 2>/dev/null; echo setup-app-on"   # Google TV, see build-and-install.sh
   echo "pm enable $STOCK"
+  # Back to the stock home: switch the launcher's Home button service off (kept when com.krushock.itvlauncher is kept)
+  if [ "$STOCK" != com.krushock.itvlauncher ]; then
+    echo 'cur=$(settings get secure enabled_accessibility_services); new=$(echo "$cur" | sed -E "s#:?com\.krushock\.itvlauncher/\.HomeKeyService##; s#^:##"); if [ -z "$new" ] || [ "$new" = null ]; then settings delete secure enabled_accessibility_services; else settings put secure enabled_accessibility_services "$new"; fi; echo home-button-off'
+  fi
   # resolve the stock HOME component on the TV (Android 9 needs pkg/activity, not just pkg)
   echo "cmd package set-home-activity --user 0 \$(cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME $STOCK | tail -n 1)"
   echo "settings put global window_animation_scale 1.0"

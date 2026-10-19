@@ -175,11 +175,11 @@ and put its details in `~/.config/krushock/itvlauncher-signing.properties` (`sto
 a release build means uninstalling first; carry the layout over with **Back up layout** / **Restore layout**
 (a backup can also be pushed into `/sdcard/Android/data/com.krushock.itvlauncher/files/` over adb).
 
-**Going back without a computer:** Controls → More settings → **Restore Google TV home** opens the
-stock launcher's page in Settings; choose Enable, then OK, and the original home screen is back.
-(On Google TV the stock launcher takes Home over whenever it's enabled, which is why the installer
-switches it off. Settings offers no Disable for it, so coming back to this launcher means running
-the install script again.)
+**Going back without a computer:** on Google TV, Controls → More settings → **Use Google TV home**
+switches the Home button service off and Google TV is home again; Settings → System → Accessibility →
+**Home button for this home screen** switches it back on. On TVs where the installer switched the stock
+launcher off, the same menu item (**Restore … home**) opens its page in Settings: choose Enable, then OK
+(coming back to this launcher means running the install script again).
 
 ## The launcher
 
@@ -338,10 +338,16 @@ Things that bit us or contributors, so they don't bite you.
   Home before `screencap`.
 - **Disable the stock launcher only after the new one is installed**, or the Home button lands on
   a factory test app.
-- **Google TV: Home shows a black screen** after the stock launcher is switched off. Google's setup
-  app (`com.google.android.tungsten.setupwraith`) has a recovery home screen that outranks any
-  installed launcher, and adb may only switch off the whole app, not that screen. The install
-  script does it (seen on a Sony BRAVIA, Android 12); `restore.sh` turns it back on.
+- **Google TV: don't switch the stock launcher off.** It always wins the Home button while it's
+  enabled, but switching it off breaks voice search ("Google Assistant has trouble processing your
+  request": the Assistant asks it which mode the TV is in), removes the Google Home panel, and its
+  setup app (`com.google.android.tungsten.setupwraith`) then shows a black recovery screen on Home
+  and stops answering Sony's country lookups. So on Google TV the install script leaves both on and
+  switches on the launcher's accessibility service (`HomeKeyService`) instead: Home opens this
+  launcher, holding Home opens Google TV's panel, and Google TV's home is swapped out whenever it
+  appears (after a restart, backing out of an app). Seen on a Sony BRAVIA, Android 12. If an older
+  install had switched Google TV's home off, the script lets it load once for 20 seconds after switching
+  it back on: until it has, its title pages (voice search results) keep loading for a minute or more.
 - **Play Protect warns about apps "built for an older version of Android"** and may block the
   install. The launcher targets the newest Android (`targetSdk` 37) to avoid that.
 - **No on-screen keyboard** after switching launchers, seen on Xiaomi: the default input method

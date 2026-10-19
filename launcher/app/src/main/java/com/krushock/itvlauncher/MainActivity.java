@@ -1704,7 +1704,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         String stock = stockLauncher();
         if (stock != null) {
             p.addSeparator();
-            p.addRow(R.drawable.ic_livetv, getString(R.string.restore_stock_home, appLabel(stock)),
+            int label = HomeKeyService.isRunning() ? R.string.use_stock_home : R.string.restore_stock_home;
+            p.addRow(R.drawable.ic_livetv, getString(label, appLabel(stock)),
                     () -> grid.post(() -> confirmStockHome(anchor, stock)));
         }
         p.showAt(anchor, (int) (260 * density));
@@ -1740,6 +1741,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private void confirmStockHome(View anchor, String pkg) {
         GlassPopup p = new GlassPopup(this, root);
         p.upTo(() -> showMoreSettings(anchor));
+        if (HomeKeyService.isRunning()) {
+            // Google TV's home is on and the Home button service makes this one home: switching the service off
+            // is all it takes, and Accessibility settings switch it back on.
+            p.addTitle(getString(R.string.use_stock_home, appLabel(pkg)));
+            p.addNote(getString(R.string.restore_stock_home_note_service, appLabel(pkg), getString(R.string.home_key_service)));
+            p.addRow(R.drawable.ic_restore, getString(R.string.use_stock_home, appLabel(pkg)), () -> {
+                HomeKeyService.handBack();
+                try {
+                    startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setPackage(pkg)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                } catch (ActivityNotFoundException ignored) {
+                    // Google TV's home is switched off too: the next Home press finds whatever home is left
+                }
+            });
+            p.addRow(R.drawable.ic_check, getString(R.string.cancel), () -> { });
+            p.showAt(anchor, (int) (260 * density));
+            return;
+        }
         p.addTitle(getString(R.string.restore_stock_home, appLabel(pkg)));
         p.addNote(getString(R.string.restore_stock_home_note, appLabel(pkg)));
         p.addRow(R.drawable.ic_restore, getString(R.string.open_in_settings), () -> open(

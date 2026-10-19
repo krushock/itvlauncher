@@ -4,10 +4,13 @@ set -euo pipefail
 cd "$(dirname "$0")"
 : "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.168.1.50 $0}"
 STOCK_LAUNCHER="${STOCK_LAUNCHER:-com.google.android.tvlauncher}"
-# Google TV's setup app has a "recovery" home screen that outranks any installed launcher once the stock one is
-# off (Home then shows a black screen). Android won't let adb switch off just that screen, so the whole setup app
-# goes; the TV is already set up, and restore.sh or a factory reset turns it back on. Absent elsewhere: no-op.
-SETUP_RECOVERY=com.google.android.tungsten.setupwraith
+# Google TV (launcherx) keeps its own home on: voice search asks it which mode the TV is in, it holds the Google
+# Home panel, and its setup app answers Sony's country lookups. Google TV's home always wins the Home button while
+# it's on, so this launcher's accessibility service (HomeKeyService) takes the button over instead. Other TVs
+# switch their stock launcher off, as before.
+GOOGLE_TV_HOME=com.google.android.apps.tv.launcherx
+SETUP_APP=com.google.android.tungsten.setupwraith
+HOME_SERVICE=com.krushock.itvlauncher/.HomeKeyService
 # JDK 17 or newer: Android Studio's bundled one first, then any the system knows about.
 if [ -z "${JAVA_HOME:-}" ]; then
   for jbr in "/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
@@ -48,6 +51,30 @@ esac
 out=$("$PY" -I ../tools/tv.py "cmd package set-home-activity --user 0 com.krushock.itvlauncher/.MainActivity")
 echo "$out"
 case "$out" in *[Ee]rror*) echo "could not set the new launcher as home; the stock launcher was left untouched" >&2; exit 1 ;; esac
+case "$("$PY" -I ../tools/tv.py "pm list packages $GOOGLE_TV_HOME")" in
+  *"package:$GOOGLE_TV_HOME"*) GOOGLE_TV=1 ;;
+  *) GOOGLE_TV=0 ;;
+esac
+if [ "$GOOGLE_TV" = 1 ]; then
+  # Switched off before (an older install): Google TV's home must run once to catch up, or its title pages (voice
+  # search results) keep loading for a minute or more. Give it 20 seconds before the service takes Home over.
+  case "$("$PY" -I ../tools/tv.py "pm list packages -d $GOOGLE_TV_HOME")" in
+    *"package:$GOOGLE_TV_HOME"*) WARM_UP="am start -n $GOOGLE_TV_HOME/.home.HomeActivity >/dev/null 2>&1; sleep 20; echo google-tv-home-loaded" ;;
+    *) WARM_UP="echo google-tv-home-ready" ;;
+  esac
+  HOME_STEPS=(
+    "pm enable $GOOGLE_TV_HOME"
+    "pm enable $SETUP_APP 2>/dev/null; echo setup-app-on"
+    "$WARM_UP"
+    # add the Home button service to whatever accessibility services are already on
+    'cur=$(settings get secure enabled_accessibility_services); case "$cur" in *'"$HOME_SERVICE"'*) ;; null|"") settings put secure enabled_accessibility_services '"$HOME_SERVICE"' ;; *) settings put secure enabled_accessibility_services "$cur:'"$HOME_SERVICE"'" ;; esac; settings put secure accessibility_enabled 1; echo home-button-on'
+  )
+else
+  HOME_STEPS=(
+    "pm disable-user --user 0 $STOCK_LAUNCHER"
+    "cmd package set-home-activity --user 0 com.krushock.itvlauncher/.MainActivity"
+  )
+fi
 printf '%s\n' \
   "pm grant com.krushock.itvlauncher android.permission.ACCESS_FINE_LOCATION 2>/dev/null; pm grant com.krushock.itvlauncher android.permission.ACCESS_COARSE_LOCATION 2>/dev/null; echo location-granted" \
   "pm grant com.krushock.itvlauncher android.permission.READ_EXTERNAL_STORAGE 2>/dev/null; pm grant com.krushock.itvlauncher android.permission.READ_MEDIA_IMAGES 2>/dev/null; echo photos-granted" \
@@ -56,12 +83,19 @@ printf '%s\n' \
   "pm grant com.krushock.itvlauncher android.permission.READ_TV_LISTINGS 2>/dev/null; echo top-shelf-granted" \
   "appops set com.krushock.itvlauncher GET_USAGE_STATS allow 2>/dev/null; echo recent-apps-granted" \
   "sleep 2; cmd notification allow_listener com.krushock.itvlauncher/com.krushock.itvlauncher.MediaWatcher 2>/dev/null; echo now-playing-granted" \
-  "pm disable-user --user 0 $STOCK_LAUNCHER" \
-  "pm disable-user --user 0 $SETUP_RECOVERY 2>/dev/null; echo setup-recovery-off" \
-  "cmd package set-home-activity --user 0 com.krushock.itvlauncher/.MainActivity" \
+  "${HOME_STEPS[@]}" \
   | "$PY" -I ../tools/tv.py --batch
-home=$("$PY" -I ../tools/tv.py "cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tail -n 1")
-case "$home" in
-  *com.krushock.itvlauncher*) echo "Installed. Press Home on the remote to see it." ;;
-  *) echo "Installed, but Home still opens $home (see README: Working on the TV)." >&2; exit 1 ;;
-esac
+if [ "$GOOGLE_TV" = 1 ]; then
+  on=$("$PY" -I ../tools/tv.py "settings get secure enabled_accessibility_services")
+  case "$on" in
+    *"$HOME_SERVICE"*) "$PY" -I ../tools/tv.py "input keyevent KEYCODE_HOME" >/dev/null
+                       echo "Installed. Home now opens this launcher; hold Home for Google TV's panel." ;;
+    *) echo "Installed, but the Home button service didn't switch on: Settings > Accessibility > Home button for this home screen" >&2; exit 1 ;;
+  esac
+else
+  home=$("$PY" -I ../tools/tv.py "cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME | tail -n 1")
+  case "$home" in
+    *com.krushock.itvlauncher*) echo "Installed. Press Home on the remote to see it." ;;
+    *) echo "Installed, but Home still opens $home (see README: Working on the TV)." >&2; exit 1 ;;
+  esac
+fi

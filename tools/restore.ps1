@@ -26,4 +26,8 @@ $cmds = @($pkgs | ForEach-Object { "pm enable $_" }) + @(
     'settings put global animator_duration_scale 1.0',
     'pm list packages -d'
 )
+# Back to the stock home: switch the launcher's Home button service off (kept when com.krushock.itvlauncher is kept)
+if ($Stock -ne 'com.krushock.itvlauncher') {
+    $cmds += 'cur=$(settings get secure enabled_accessibility_services); new=$(echo "$cur" | sed -E "s#:?com\.krushock\.itvlauncher/\.HomeKeyService##; s#^:##"); if [ -z "$new" ] || [ "$new" = null ]; then settings delete secure enabled_accessibility_services; else settings put secure enabled_accessibility_services "$new"; fi; echo home-button-off'
+}
 $cmds | & $py -I (Join-Path $repo 'tools\tv.py') --batch

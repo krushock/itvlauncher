@@ -113,4 +113,8 @@
     <string name="open_in_settings">In Einstellungen öffnen</string>
     <string name="now_playing">Aktuelle Wiedergabe</string>
     <string name="open_app">%1$s öffnen</string>
+    <string name="home_key_service">Home-Taste für diesen Startbildschirm</string>
+    <string name="home_key_service_description">Öffnet diesen Startbildschirm, wenn du Home drückst und wenn der Google TV-Startbildschirm erscheint. Home gedrückt halten öffnet das Google TV-Menü. Sieht nur die Home-Taste und den Google TV-Startbildschirm; nichts verlässt den Fernseher.</string>
+    <string name="restore_stock_home_note_service">%1$s wird wieder der Startbildschirm. Zurück: Einstellungen → System → Bedienungshilfen → %2$s → An.</string>
+    <string name="use_stock_home">%1$s-Startbildschirm verwenden</string>
 </resources>

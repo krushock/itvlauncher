@@ -113,4 +113,8 @@
     <string name="open_in_settings">Open in Settings</string>
     <string name="now_playing">Now Playing</string>
     <string name="open_app">Open %1$s</string>
+    <string name="home_key_service">Home button for this home screen</string>
+    <string name="home_key_service_description">Opens this home screen when you press Home, and when Google TV’s home appears. Holding Home opens Google TV’s panel. It only sees the Home button and Google TV’s home; nothing leaves the TV.</string>
+    <string name="restore_stock_home_note_service">%1$s becomes the home screen again. To come back: Settings → System → Accessibility → %2$s → On.</string>
+    <string name="use_stock_home">Use %1$s home</string>
 </resources>

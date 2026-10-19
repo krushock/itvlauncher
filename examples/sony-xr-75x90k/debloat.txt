@@ -6,8 +6,9 @@
 #          (keeps launcher/ as home; pass com.google.android.apps.tv.launcherx instead to get Google TV back)
 # Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
 #
-# Stock launcher: com.google.android.apps.tv.launcherx. With launcher/ installed, build-and-install.sh has already
-# switched it off together with com.google.android.tungsten.setupwraith (its recovery home outranks launcher/).
+# Stock launcher: com.google.android.apps.tv.launcherx. Keep it and com.google.android.tungsten.setupwraith on: voice
+# search needs launcherx, and Sony's system service asks setupwraith for the country. launcher/ takes the Home button
+# over with its accessibility service instead (build-and-install.sh switches that on).
 # Keep: com.sony.dtv.tvx (TV app, inputs, HDMI), com.sony.dtv.braviasync* (HDMI-CEC), com.sony.dtv.tvinput.*,
 # com.sony.dtv.settings*, com.sony.dtv.systemupdate/update/otaurlprovisioning (firmware updates),
 # com.sony.dtv.smartmediaapp (USB photos/music/video), com.vewd.core.* (casting from phone apps over DIAL),
