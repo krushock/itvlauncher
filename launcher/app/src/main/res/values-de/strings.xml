@@ -84,7 +84,7 @@
     <string name="restore_layout">Layout wiederherstellen</string>
     <string name="restore_layout_question">Dieses Layout durch die Sicherung ersetzen?</string>
     <string name="backup_saved">Gespeichert unter %1$s</string>
-    <string name="backup_failed">Sicherung fehlgeschlagen. build-and-install erneut ausführen, um Speicherzugriff zu erlauben.</string>
+    <string name="backup_failed">Sicherung fehlgeschlagen. Setup erneut ausführen, um Speicherzugriff zu erlauben.</string>
     <string name="restored">Layout wiederhergestellt</string>
     <string name="restore_failed">Die Sicherung konnte nicht gelesen werden</string>
     <string name="connecting">Verbindung wird hergestellt …</string>

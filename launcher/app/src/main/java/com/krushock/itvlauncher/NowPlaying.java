@@ -26,7 +26,7 @@ final class NowPlaying {
         try {
             sessions = msm.getActiveSessions(new ComponentName(ctx, MediaWatcher.class));
         } catch (SecurityException e) {
-            return null;   // the notification listener isn't enabled (build-and-install switches it on)
+            return null;   // the notification listener isn't enabled (setup switches it on)
         }
         MediaController fallback = null;
         for (MediaController c : sessions) {

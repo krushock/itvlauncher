@@ -84,7 +84,7 @@
     <string name="restore_layout">Restore layout</string>
     <string name="restore_layout_question">Replace this layout with the backup?</string>
     <string name="backup_saved">Saved to %1$s</string>
-    <string name="backup_failed">Couldn’t save the backup. Run build-and-install again to allow storage access.</string>
+    <string name="backup_failed">Couldn’t save the backup. Run setup again to allow storage access.</string>
     <string name="restored">Layout restored</string>
     <string name="restore_failed">That backup couldn’t be read</string>
     <string name="connecting">Connecting…</string>

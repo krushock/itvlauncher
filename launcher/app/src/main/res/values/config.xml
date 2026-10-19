@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Launcher configuration. Edit this file, then run launcher/build-and-install.sh.
+  Launcher configuration. Edit this file, then run ./setup.sh.
   Package names: on the TV run `pm list packages` (tools/tv.py 'pm list packages').
 -->
 <resources>

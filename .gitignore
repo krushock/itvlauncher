@@ -12,3 +12,6 @@ TASKS.md
 dashboard.html
 .claude/
 CLAUDE.local.md
+
+# release packages built by tools/package.py
+dist/
