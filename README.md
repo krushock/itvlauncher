@@ -54,10 +54,9 @@ RecyclerView, so it stays quick on 1 GB TVs.
   panel (hold Home). See [Google TV](#google-tv).
 - English and German.
 
-| | |
-|---|---|
-| ![Controls panel](docs/controls.jpg) | ![The app grid](docs/app-grid.jpg) |
-| ![Notifications](docs/notifications.jpg) | ![Choosing between places with the same name](docs/city-picker.jpg) |
+| | | |
+|---|---|---|
+| ![Controls panel](docs/controls.jpg) | ![Notifications](docs/notifications.jpg) | ![Choosing between places with the same name](docs/city-picker.jpg) |
 
 ## Install
 
