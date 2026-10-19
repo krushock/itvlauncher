@@ -56,7 +56,7 @@ RecyclerView, so it stays quick on 1 GB TVs.
 
 | | |
 |---|---|
-| ![Controls panel](docs/controls.jpg) | ![The app grid](docs/apps.jpg) |
+| ![Controls panel](docs/controls.jpg) | ![The app grid](docs/app-grid.jpg) |
 | ![Notifications](docs/notifications.jpg) | ![Choosing between places with the same name](docs/city-picker.jpg) |
 
 ## Install
