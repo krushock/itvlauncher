@@ -61,10 +61,8 @@ RecyclerView, so it stays quick on 1 GB TVs.
 
 ## Install
 
-You need an Android TV or Google TV on **Android 8 or newer**, and a computer on the same network.
-The computer needs **Python 3**, plus
-**JDK 17 or newer** and the **Android SDK** (platform 37). With
-[Android Studio](https://developer.android.com/studio) installed, the JDK and SDK are already there.
+You need an Android TV or Google TV on **Android 8 or newer**, and a computer on the same network
+with **Python 3** ([python.org](https://www.python.org/downloads/); macOS and Linux usually have it).
 
 **1. On the TV: switch on USB debugging.** It also opens debugging over the network; no cable
 needed.
@@ -74,54 +72,59 @@ needed.
 - Android TV: Settings → Device Preferences → About → press OK on **Build** seven times, then
   Developer options → **USB debugging**.
 
-Note the TV's IP address (Settings → Network).
+**2. On the computer: get the launcher.** Download the latest `itvlauncher-<version>.zip` from
+[Releases](https://github.com/krushock/itvlauncher/releases) and unzip it. It holds the ready-made,
+signed APK and the setup script; nothing needs building.
 
-**2. On the computer: build and install.**
-
-```bash
-python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt
-```
+**3. Run setup** in that folder:
 
 ```bash
-TV_HOST=192.168.1.50 launcher/build-and-install.sh
+./setup.sh
 ```
 
-On Windows (PowerShell):
+On Windows: `powershell -ExecutionPolicy Bypass -File setup.ps1`
 
-```powershell
-python -m venv tools\venv; tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt
-powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.168.1.50
-```
-
-The first time, the TV asks **"Allow USB debugging?"**: tick *Always allow from this computer* and
-choose OK.
-
-The script builds the launcher (a signed release if you've set up a [signing key](#release-builds),
-otherwise a debug build), installs it, and grants what each feature needs (listed under
-[Privacy](#privacy)). Then it makes the launcher your home screen:
+Setup finds TVs on your network with debugging on, so you don't need the TV's address. It connects
+and installs the launcher, grants what each feature needs (listed under [Privacy](#privacy)), and
+makes it your home screen:
 
 - **On Google TV**, it switches on the launcher's Home button service and leaves Google TV's own
   home on (see [Google TV](#google-tv)).
-- **On other Android TVs**, it makes the launcher the default home and switches the stock launcher
-  off, but only after the install succeeded, so Home never ends up without a home screen.
+- **On other Android TVs**, it makes the launcher the default home and switches the TV's own home
+  app off, but only after the install succeeded, so Home never ends up without a home screen.
 
-If Play Protect asks to scan the app, allow it. The launcher targets the newest Android, so the
-"built for an older version of Android" warning doesn't appear.
+The first time, the TV asks **"Allow USB debugging?"**: tick *Always allow from this computer* and
+choose OK. If Play Protect asks to scan the app, allow it.
 
-Without Android Studio, on macOS:
+**To update**, download a newer package and run setup again; it remembers your TV. Options:
+`--tv 192.168.1.50` picks a TV directly, `--scan` searches again, `--yes` accepts every default.
+
+### From source
+
+In a clone of this repository, the same `./setup.sh` builds the launcher first. Besides Python it
+needs **JDK 17 or newer** and the **Android SDK** (platform 37). With
+[Android Studio](https://developer.android.com/studio) installed both are already there; otherwise
+setup offers to install what's missing (with Homebrew on macOS, and the SDK manager). It also offers
+to create your [release signing key](#release-builds) the first time; `--debug` builds a debug
+version instead.
 
 ```bash
-brew install openjdk android-commandlinetools
-```
-
-```bash
-sdkmanager "platforms;android-37.0" "build-tools;36.0.0"
+git clone https://github.com/krushock/itvlauncher.git && cd itvlauncher && ./setup.sh
 ```
 
 The starting dock, the apps hidden at first, your TV's Live TV app and the starting number of
 tiles per row are set in
 [`launcher/app/src/main/res/values/config.xml`](launcher/app/src/main/res/values/config.xml); after
 that you arrange everything on the TV.
+
+**To make a release package** like the ones under Releases (needs the signing key):
+
+```bash
+python3 tools/package.py
+```
+
+It builds the signed release and writes `dist/itvlauncher-<version>.zip`, ready to attach to a
+GitHub Release.
 
 ## Using it
 
@@ -162,7 +165,7 @@ option either: the Assistant asks it which mode the TV is in, so voice search fa
 Assistant has trouble processing your request"), the Google Home panel disappears, and Google's
 setup app then shows a black screen on Home.
 
-So on Google TV, the install script leaves Google's home on and switches on the launcher's
+So on Google TV, setup leaves Google's home on and switches on the launcher's
 accessibility service, **Home button for this home screen** (`HomeKeyService`):
 
 - **Pressing Home** opens this launcher.
@@ -173,15 +176,18 @@ accessibility service, **Home button for this home screen** (`HomeKeyService`):
 The service sees only the Home key and the windows of Google TV's home and setup apps; it can't
 read anything on screen. You'll find it in Settings → System → Accessibility.
 
-If an earlier install had switched Google TV's home off, the script lets it load once for 20
+If an earlier install had switched Google TV's home off, setup lets it load once for 20
 seconds after switching it back on. Until it has, Google's title pages (the results of a voice
 search) keep loading for a minute or more.
 
 ## Release builds
 
-The install script builds a signed, non-debuggable release when it finds a signing key, and a debug
-build otherwise. Create the key once, **outside the repository**, and keep a copy somewhere safe:
-every update must be signed with the same key, or the TV refuses it.
+Release packages are signed with the project's key. When you build from source, setup builds a
+signed, non-debuggable release with **your own** key, and offers to create it the first time: a
+keystore and its details in `~/.config/krushock/`, outside the repository, readable only by you.
+Keep a copy somewhere safe: every update must be signed with the same key, or the TV refuses it.
+
+To create the key by hand instead:
 
 ```bash
 mkdir -p ~/.config/krushock && keytool -genkeypair -keystore ~/.config/krushock/itvlauncher-release.jks \
@@ -197,12 +203,13 @@ keyAlias=itvlauncher
 keyPassword=…
 ```
 
-or point `ITVLAUNCHER_SIGNING` at a file like it. `BUILD_VARIANT=debug` forces a debug build.
+or point `ITVLAUNCHER_SIGNING` at a file like it. `./setup.sh --debug` builds a debug version instead.
 
-Android won't install a build signed with a different key over the one on the TV, so switching
-between debug and release means uninstalling first. Carry your arrangement over with **Back up
-layout** and **Restore layout**; a backup can also be put into
-`/sdcard/Android/data/com.krushock.itvlauncher/files/` over ADB, where the new install finds it.
+Android won't install a build signed with a different key over the one on the TV (a debug build, or
+a package after your own build). Setup says so and offers to uninstall the old one first; that
+removes your arrangement, so back it up with **Back up layout** and bring it back with **Restore
+layout**. A backup can also be put into `/sdcard/Android/data/com.krushock.itvlauncher/files/` over
+ADB, where the new install finds it.
 
 ## Going back
 
@@ -211,7 +218,7 @@ button service switches itself off and Google TV is your home screen again. To c
 **Home button for this home screen** on in Settings → System → Accessibility.
 
 **On other Android TVs**, the same menu item opens the stock launcher's page in Settings: choose
-Enable, then OK. Coming back means running the install script again.
+Enable, then OK. Coming back means running setup again.
 
 **To uninstall**, switch the stock launcher back on first (other Android TVs only; Google TV's never
 went off). Its package name varies by TV; `com.google.android.tvlauncher` is the usual one. Then
@@ -234,7 +241,7 @@ you chose, and the artwork addresses your own apps publish (Top Shelf pictures, 
 account, no analytics, no ads. The weather refreshes at most every 30 minutes, and only while the
 home screen is showing. Offline, everything keeps working.
 
-**What the install script grants**, each for one feature, and nothing it reads leaves the TV:
+**What setup grants**, each for one feature, and nothing it reads leaves the TV:
 
 | Permission | For |
 |---|---|
@@ -253,12 +260,11 @@ home screen is showing. Offline, everything keeps working.
   blocks the `adb` binary under Local Network privacy. The included `tools/tv.py` is a pure-Python
   ADB client that avoids it.
 - **No "wireless debugging" toggle on the TV**: USB debugging alone opens network ADB on port 5555.
-- **Windows PowerShell 5.1 adds a byte-order mark** to piped text. `tv.py` strips it, and the `.ps1`
-  scripts pipe clean UTF-8.
-- **Git Bash rewrites paths** like `/data/local/tmp`. The scripts set `MSYS_NO_PATHCONV=1`; set
-  `JAVA_HOME` and `ANDROID_HOME` before building there.
-- **"INSTALL_FAILED_UPDATE_INCOMPATIBLE"**: the TV has the launcher signed with another key. See
-  [Release builds](#release-builds).
+- **Setup finds no TV**: check that USB debugging is on and the TV is awake, then try
+  `./setup.sh --tv <address>` with the address from the TV's network settings.
+- **"Allow USB debugging?" never appears**, or the connection times out: the TV shows the prompt
+  only while it's on; accept it within two minutes and run setup again.
+- **The TV has the launcher signed with another key**: see [Release builds](#release-builds).
 - **No on-screen keyboard** after switching launchers, seen on Xiaomi: the default input method
   points at a keyboard that isn't installed. Fix:
   `tools/tv.py 'ime set com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME'`
@@ -270,6 +276,7 @@ home screen is showing. Offline, everything keeps working.
 ## Project layout
 
 ```
+setup.sh / setup.ps1          start here: install or update the launcher on your TV
 launcher/                     the Android app (Gradle project)
   app/src/main/java/com/krushock/itvlauncher/
     MainActivity.java         the home screen: dock, grid, top bar, menus, move mode
@@ -284,14 +291,15 @@ launcher/                     the Android app (Gradle project)
     LayoutBackup.java         back up and restore the arrangement
     ClockDream.java           the clock screensaver
     PhotoDream.java           the photo screensaver
-  build-and-install.sh/.ps1   build, install, grant, make it home
 tools/
+  setup.py                    checks, TV discovery, signing, build, install, permissions, home
+  package.py                  builds a release package (dist/itvlauncher-<version>.zip)
   tv.py                       pure-Python ADB client: shell, batch, push, pull
   b64push.py                  uploads APKs in checked chunks
 docs/                         screenshots
 ```
 
-`tools/tv.py` works on its own too:
+`tools/tv.py` works on its own too, once setup has made `tools/venv`:
 
 ```bash
 TV_HOST=192.168.1.50 tools/venv/bin/python -I tools/tv.py --probe

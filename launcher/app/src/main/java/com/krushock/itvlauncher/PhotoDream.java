@@ -111,7 +111,7 @@ public class PhotoDream extends DreamService {
                 if (c == null) continue;
                 while (c.moveToNext()) out.add(Uri.withAppendedPath(volume, String.valueOf(c.getLong(0))));
             } catch (SecurityException | IllegalArgumentException ignored) {
-                // No storage permission (granted by build-and-install) or the volume went away.
+                // No storage permission (granted by setup) or the volume went away.
             }
         }
         return out;

@@ -272,7 +272,7 @@ final class TopShelf {
                 out.add(it);
             }
         } catch (SecurityException | IllegalArgumentException ignored) {
-            // No READ_TV_LISTINGS (run build-and-install again) or a TV without the TV provider.
+            // No READ_TV_LISTINGS (run setup again) or a TV without the TV provider.
         }
     }
 
