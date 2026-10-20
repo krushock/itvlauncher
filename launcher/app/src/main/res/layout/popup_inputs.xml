@@ -5,8 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/glass_panel"
-    android:padding="6dp"
-    android:elevation="12dp">
+    android:padding="10dp">
 
     <!-- Scrolls when the popup is taller than the screen (a long list of notifications); the edges fade to show
          there's more. Not focusable itself: focus goes to the rows. -->

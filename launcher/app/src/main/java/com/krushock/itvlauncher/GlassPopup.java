@@ -1,10 +1,15 @@
 package com.krushock.itvlauncher;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
+import android.view.PixelCopy;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +47,7 @@ final class GlassPopup {
     private final Activity activity;
     private final ViewGroup root;
     private final float density;
+    private final GlassMaterial material;
 
     GlassPopup(Activity activity, ViewGroup root) {
         this.activity = activity;
@@ -49,6 +55,8 @@ final class GlassPopup {
         density = activity.getResources().getDisplayMetrics().density;
         panel = activity.getLayoutInflater().inflate(R.layout.popup_inputs, root, false);
         rows = panel.findViewById(R.id.rows);
+        material = new GlassMaterial(density, Look.light(activity));
+        panel.setBackground(material);
         window = new PopupWindow(panel, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));   // needed for Back to dismiss
         window.setOutsideTouchable(true);
@@ -196,6 +204,31 @@ final class GlassPopup {
         show((root.getWidth() - w) / 2, (root.getHeight() - h) / 2, h / 2f, 0);
     }
 
+    /**
+     * The frosted glass: an eighth-size copy of the screen under the panel, blurred, becomes its backdrop. The copy
+     * comes from the launcher's own window (PixelCopy), so it's what's really on screen; if the TV can't copy it,
+     * the panel keeps its solid tint.
+     */
+    private void captureBackdrop(int x, int y) {
+        View decor = activity.getWindow().getDecorView();
+        int w = window.getWidth() > 0 ? window.getWidth() : panel.getMeasuredWidth();
+        int h = window.getHeight() > 0 ? window.getHeight() : panel.getMeasuredHeight();
+        Rect area = new Rect(x, y, x + w, y + h);
+        if (w <= 0 || h <= 0 || !area.intersect(0, 0, decor.getWidth(), decor.getHeight())) return;
+        int scale = 8;
+        Bitmap small = Bitmap.createBitmap(Math.max(1, area.width() / scale), Math.max(1, area.height() / scale),
+                Bitmap.Config.ARGB_8888);
+        try {
+            PixelCopy.request(activity.getWindow(), area, small, result -> {
+                if (result != PixelCopy.SUCCESS) return;
+                GlassMaterial.blur(small, 4);
+                material.setBackdrop(small, (float) area.width() / small.getWidth());
+            }, new Handler(Looper.getMainLooper()));
+        } catch (RuntimeException ignored) {
+            // no surface to copy yet: the solid tint stays
+        }
+    }
+
     /** A popup taller than {@code max} gets that height and scrolls inside; returns the height it will have. */
     private int capHeight(int h, int max) {
         if (h <= max || max <= 0) return h;
@@ -210,6 +243,7 @@ final class GlassPopup {
         boolean still = Look.reduceMotion(activity);   // Reduce Motion: fade only
         panel.setScaleY(still ? 1f : 0.92f);
         panel.setTranslationY(still ? 0f : fromDp * density);
+        captureBackdrop(x, y);
         window.showAtLocation(root, Gravity.TOP | Gravity.START, x, y);
         open.removeIf(r -> r.get() == null || !r.get().isShowing());
         open.add(new java.lang.ref.WeakReference<>(window));
